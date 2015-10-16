@@ -6,12 +6,21 @@ angular.module('myApp', [
   'myApp.version'
 ]).
 config(['$routeProvider', function($routeProvider) {
-
+      $routeProvider.
+          when('/showList', {
+            templateUrl: 'templates/showList.html'
+          })
+          .when('/login', {
+            templateUrl: 'templates/login.html'
+          })
+          .otherwise({
+            redirectTo: '/login'
+          });
 }]);
 
-// Keep dropdown menu open until clicked again
-$('.dropdown.keep-open').on({
+// TODO fix bugs - Keep dropdown menu open until clicked again (add to <li class="dropdown">)
+/*$('.dropdown.keep-open').on({
   "shown.bs.dropdown": function() { this.closable = false; },
-  "click":             function() { this.closable = true; },
+  "click":             function() { this.closable = false; },
   "hide.bs.dropdown":  function() { return this.closable; }
-});
+});*/

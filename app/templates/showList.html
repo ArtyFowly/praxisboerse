@@ -1,0 +1,63 @@
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Praxisbörse HsKA</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Filter</a>
+                    <ul class="dropdown-menu list-inline" onclick="event.stopPropagation();">
+                        <!-- filter by "Angebotsart" (on server) -->
+                        <li>
+                            <div>
+                                <select class="form-control">
+                                    <option>Alle Angebotsarten</option>
+                                    <option>Praxissemester</option>
+                                    <option>Bachelorarbeit</option>
+                                </select>
+                            </div>
+                        </li>
+                        <!-- filter by "Standort" (on client) -->
+                        <li>
+                            <div>
+                                <select class="form-control">
+                                    <option>Alle Standorte</option>
+                                    <option>Deutschland</option>
+                                    <option>USA</option>
+                                </select>
+                            </div>
+                        </li>
+                        <!-- filter by keyword (on server) -->
+                        <li>
+                            <input class="form-control" type="text" name="input_suche" placeholder="Suche">
+                        </li>
+                        <!-- TODO apply filter -->
+                        <li>
+                            <a href="#showList"><span class="glyphicon glyphicon-menu-right"></span></a>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#login">Logout</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<hr>
+
+<div class="container">
+    <div class="column">
+        <div class="row">
+            <h2>Heading</h2>
+            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div>
+        <div class="row">
+            <h2>Heading</h2>
+            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div>
+    </div>
+</div> <!-- /container -->
