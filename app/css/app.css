@@ -31,16 +31,7 @@
 
 /* custom */
 
-.nav > li.dropdown.open {
-  position: static;
-}
-.nav > li.dropdown.open .dropdown-menu {
-  display:table;
-  width: 100%;
-  text-align: center;
-  left:0;
-  right:0;
-}
-.dropdown-menu>li {
-  display: table-cell;
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
 }
