@@ -1,110 +1,119 @@
 'use strict';
 // Declare app level module which depends on views, and components
-angular
-    .module('myApp', ['ngRoute','myApp.version','base64'])
-    .factory('StatusNotifier', function($rootScope) {
-        return {
-            subscribeLogin: function(scope, callback) {
-                var loginHandler = $rootScope.$on('LoginEvent', callback);
-                scope.$on('$destroy', loginHandler);
-            },
-            subscribeLogout: function(scope, callback) {
-                var logoutHandler = $rootScope.$on('LogoutEvent', callback);
-                scope.$on('$destroy', logoutHandler);
-            },
-            notifyLogin: function() {
-                $rootScope.$emit('LoginEvent');
-            },
-            notifyLogout: function() {
-                $rootScope.$emit('LogoutEvent');
-            }
-        };
-    })
-    .factory('Credentials', function() {
-        var Credentials = {
-            username: '',
-            password: '',
-            encryptedpassword: ''
-        };
+var app = angular.module('myApp', ['ngRoute','myApp.version','base64', 'restServices']);
 
-        return Credentials;
-    })
-    .controller('navController', function($scope, StatusNotifier) {
-        StatusNotifier.subscribeLogin($scope, function() {
-            document.getElementById("nav_login").style.display = "none";
-            document.getElementById("nav_logout").style.display = "inherit";
-            document.getElementById("nav_filter").style.display = "inherit";
-        });
+app.factory('AppNotifier', function($rootScope) {
+    return {
+        subscribeLogin: function(scope, callback) {
+            var loginHandler = $rootScope.$on('LoginEvent', callback);
+            scope.$on('$destroy', loginHandler);
+        },
+        subscribeLogout: function(scope, callback) {
+            var logoutHandler = $rootScope.$on('LogoutEvent', callback);
+            scope.$on('$destroy', logoutHandler);
+        },
+        subscribeFilter: function(scope, callback) {
+            var filterHandler = $rootScope.$on('FilterEvent', callback);
+            scope.$on('$destroy', filterHandler);
+        },
+        notifyLogin: function() {
+            $rootScope.$emit('LoginEvent');
+        },
+        notifyLogout: function() {
+            $rootScope.$emit('LogoutEvent');
+        },
+        notifyFilter: function() {
+            $rootScope.$emit('FilterEvent');
+        }
+    };
+});
 
-        StatusNotifier.subscribeLogout($scope, function() {
-            document.getElementById("nav_login").style.display = "inherit";
-            document.getElementById("nav_logout").style.display = "none";
-            document.getElementById("nav_filter").style.display = "none";
-        });
+app.factory('Credentials', function() {
+    var Credentials = {
+        username: '',
+        password: ''
+    };
 
-        StatusNotifier.notifyLogout();
-    })
-    .controller('loginController', function($scope, $http, $location, $base64, Credentials, StatusNotifier) {
-        $scope.login = function () {
-            Credentials.username = '';
-            Credentials.password = '';
-            Credentials.encryptedpassword = '';
+    return Credentials;
+});
 
-            // Encrypt password
-            var config = {
-                method: 'GET',
-                url: 'https://www.iwi.hs-karlsruhe.de/Intranetaccess/REST/credential/encryptedpassword',
-                headers: {
-                    'Authorization': 'Basic ' + $base64.encode($scope.username + ':' + $scope.password)
-                },
-                transformResponse: [function (data) {
-                    // do nothing, simply pass the encrypted password
-                    return data;
-                }]
-            };
-            $http(config)
-                .then(function successCallback(response) {
-                    Credentials.encryptedpassword = response;
+app.factory('List', function() {
+    // populate through REST
+});
 
-                    // Check credentials
-                    var config = {
-                        method: 'GET',
-                        url: 'https://www.iwi.hs-karlsruhe.de/Intranetaccess/REST/credential/check/' + $scope.username + '/' + Credentials.encryptedpassword
-                    }
-                    $http(config)
-                        .then(function successCallback(response) {
-                            Credentials.username = $scope.username;
-                            Credentials.password = $scope.password;
-                            StatusNotifier.notifyLogin();
-                        }, function errorCallback(response) {
-                            console.log(response.data);
-                            alert('Login fehlgeschlagen.');
-                        });
-                }, function errorCallback(response) {
-                    console.log(response);
-                    alert('Login fehlgeschlagen.');
-                });
-        };
-    })
-    .controller('logoutController', function($scope, StatusNotifier) {
-        $scope.logout = function() {
-            StatusNotifier.notifyLogout();
-        };
-    })
-    .controller('listController', function($base64, $scope, $http, Credentials){
-        var config = {
-            method: 'GET',
-            url: 'https://www.iwi.hs-karlsruhe.de/Intranetaccess/REST/joboffer/offers/joboffer/0/-1',
-            headers: {
-                'Authorization': 'Basic ' + $base64.encode(Credentials.username + ':' + Credentials.password)
-            },
-            respondType: 'json'
-        };
-        $http(config).then(function successCallback(response) {
-            var obj = response.data;
-            $scope.jobs = obj.offers;
-        }, function errorCallback(response) {
-            console.log(response)
-            alert('Anzeige fehlgeschlagen.');
-        });
+app.controller('viewController', function($scope, AppNotifier, Credentials, Credential) {
+
+    // Display content according to login, logout and filter status
+
+    AppNotifier.subscribeLogin($scope, function() {
+        $scope.showContentList = true;
+        $scope.showContentWelcome = false;
+        $scope.showNavbarFilter = true;
+        $scope.showNavbarLogin = false;
+        $scope.showNavbarLogout = true;
     });
+
+    AppNotifier.subscribeLogout($scope, function() {
+        $scope.showContentList = false;
+        $scope.showContentWelcome = true;
+        $scope.showNavbarFilter = false;
+        $scope.showNavbarLogin = true;
+        $scope.showNavbarLogout = false;
+    });
+
+    AppNotifier.subscribeFilter($scope, function() {
+        // TODO load filtered list from List service
+    });
+
+    // Initial status: logged out
+
+    AppNotifier.notifyLogout();
+
+    // Initial model
+
+    $scope.model = {username: '', password: ''};
+
+    // Methods for login, logout and filter
+
+    $scope.login = function() {
+        // TODO reactivate encryption
+        /*Credential.encryptedpassword($scope.username, $scope.password)
+            .then(function success(encryptedpassword) {
+                console.log('Encrypted password: ' + encryptedpassword);*/
+                Credential.check($scope.model.username, $scope.model.password)
+                    .then(function success(check) {
+                        if (check) {
+                            console.log('Check successful: ' + check);
+
+                            // Login
+                            Credentials.username = $scope.model.username;
+                            Credentials.password = $scope.model.password;
+                            AppNotifier.notifyLogin();
+                        } else {
+                            console.log('Check unsuccessful: ' + check);
+                            alert('Login fehlgeschlagen.');
+                        }
+                    }, function error(error) {
+                        console.log('Check unsuccessful with error: ' + error);
+                        alert('Login fehlgeschlagen.');
+                    });
+            /*}, function error(error) {
+                console.log('Encryption unsuccessful: ' + error);
+                alert('Login fehlgeschlagen.');
+            });*/
+    };
+
+    $scope.logout = function() {
+        // Logout
+        Credentials.username = '';
+        Credentials.password = '';
+        AppNotifier.notifyLogout();
+    };
+
+    $scope.filter = function(param_angebotsart, param_standort, param_keyword, param_merkzettel) {
+        // TODO Filter list
+        // - make REST call through restServices.Joboffer
+        // - save filtered list in List service
+        AppNotifier.notifyFilter();
+    };
+});

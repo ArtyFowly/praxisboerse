@@ -1,63 +1,86 @@
-<!-- Fixed navbar -->
-<nav class="navbar navbar-default navbar-fixed-top" ng-controller="navController">
-    <div class="container">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">Praxisb&ouml;rse HsKA</a>
+<span ng-controller="viewController">
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Praxisb&ouml;rse HsKA</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <!-- Filter button -->
+                    <li ng-if="showNavbarFilter" class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Filter</a>
+                        <ul class="dropdown-menu list-inline" onclick="event.stopPropagation();">
+                            <!-- filter by "Angebotsart" (on server) -->
+                            <li>
+                                <div>
+                                    <select class="form-control">
+                                        <option>Alle Angebotsarten</option>
+                                        <option>Praxissemester</option>
+                                        <option>Bachelorarbeit</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <!-- filter by "Standort" (on client) -->
+                            <li>
+                                <div>
+                                    <select class="form-control">
+                                        <option>Alle Standorte</option>
+                                        <option>Deutschland</option>
+                                        <option>USA</option>
+                                    </select>
+                                </div>
+                            </li>
+                            <!-- filter by keyword (on server) -->
+                            <li>
+                                <input class="form-control" type="text" name="input_suche" placeholder="Suche">
+                            </li>
+                            <!-- TODO apply filter -->
+                            <li>
+                                <a href="#"><span class="glyphicon glyphicon-menu-right"></span></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Login button -->
+                    <li ng-if="showNavbarLogin" class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
+                        <ul class="dropdown-menu list-inline" onclick="event.stopPropagation();">
+                            <li>
+                                <input class="form-control" type="text" name="input_izaccount" placeholder="IZ-Account" ng-model="model.username">
+                            </li>
+                            <li>
+                                <input class="form-control" type="password" name="input_password" placeholder="Passwort" ng-model="model.password">
+                            </li>
+                            <li>
+                                <a href="#" ng-click="login()"><span class="glyphicon glyphicon-menu-right"></span></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Logout button -->
+                    <li ng-if="showNavbarLogout" ng-click="logout()"><a href="#">Logout</a></li>
+                </ul>
+            </div>
         </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-                <!-- Filter button -->
-                <li id="nav_filter" class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Filter</a>
-                    <ul class="dropdown-menu list-inline" onclick="event.stopPropagation();">
-                        <!-- filter by "Angebotsart" (on server) -->
-                        <li>
-                            <div>
-                                <select class="form-control">
-                                    <option>Alle Angebotsarten</option>
-                                    <option>Praxissemester</option>
-                                    <option>Bachelorarbeit</option>
-                                </select>
-                            </div>
-                        </li>
-                        <!-- filter by "Standort" (on client) -->
-                        <li>
-                            <div>
-                                <select class="form-control">
-                                    <option>Alle Standorte</option>
-                                    <option>Deutschland</option>
-                                    <option>USA</option>
-                                </select>
-                            </div>
-                        </li>
-                        <!-- filter by keyword (on server) -->
-                        <li>
-                            <input class="form-control" type="text" name="input_suche" placeholder="Suche">
-                        </li>
-                        <!-- TODO apply filter -->
-                        <li>
-                            <a href="#"><span class="glyphicon glyphicon-menu-right"></span></a>
-                        </li>
-                    </ul>
-                </li>
-                <!-- Login button -->
-                <li id="nav_login" class="dropdown" ng-controller="loginController">
-                    <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Login</a>
-                    <ul class="dropdown-menu list-inline" onclick="event.stopPropagation();">
-                        <li>
-                            <input class="form-control" type="text" name="input_izaccount" placeholder="IZ-Account" ng-model="username">
-                        </li>
-                        <li>
-                            <input class="form-control" type="password" name="input_password" placeholder="Passwort" ng-model="password">
-                        </li>
-                        <li>
-                            <a href="#" ng-click="login()"><span class="glyphicon glyphicon-menu-right"></span></a>
-                        </li>
-                    </ul>
-                </li>
-                <!-- Logout button -->
-                <li id="nav_logout" ng-controller="logoutController" ng-click="logout()"><a href="#">Logout</a></li>
-            </ul>
-        </div><!--/.nav-collapse -->
+    </nav>
+
+    <hr>
+
+    <!-- Job list -->
+    <div class="container">
+        <div ng-if="showContentList" class="column" ng-repeat="x in jobs" ng-init="jobs">
+            <div class="row">
+                <h2> {{ x.id }}</h2>
+                <p>{{ x.contact }}</p>
+                <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+            </div>
+        </div>
+        <div ng-if="showContentWelcome" class="column">
+            <div class="row">
+                <h2>Herzlich Willkommen!</h2>
+                <p>Das ist die Praxisb&ouml;rse der Hochschule Karlsruhe f&uuml;r Technik und Wirtschaft. Bitte loggen Sie sich mit Ihrem IZ-Account ein, um das Portal nutzen zu k&ouml;nnen.</p>
+            </div>
+        </div>
     </div>
-</nav>
+
+</span>
