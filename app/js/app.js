@@ -38,10 +38,13 @@ app.factory('Credentials', function() {
 });
 
 app.factory('List', function() {
-    // populate through REST
+    // populated through REST
+    var List = {};
+    List.offers = [];
+    return List;
 });
 
-app.controller('viewController', function($scope, AppNotifier, Credentials, Credential) {
+app.controller('viewController', function($scope, AppNotifier, Credentials, List, Credential, Joboffer) {
 
     // Display content according to login, logout and filter status
 
@@ -62,7 +65,7 @@ app.controller('viewController', function($scope, AppNotifier, Credentials, Cred
     });
 
     AppNotifier.subscribeFilter($scope, function() {
-        // TODO load filtered list from List service
+        $scope.model.offers = List.offers;
     });
 
     // Initial status: logged out
@@ -71,15 +74,15 @@ app.controller('viewController', function($scope, AppNotifier, Credentials, Cred
 
     // Initial model
 
-    $scope.model = {username: '', password: ''};
+    $scope.model = {username: '', password: '', offers: []};
 
     // Methods for login, logout and filter
 
     $scope.login = function() {
         // TODO reactivate encryption
-        /*Credential.encryptedpassword($scope.username, $scope.password)
+        Credential.encryptedpassword($scope.model.username, $scope.model.password)
             .then(function success(encryptedpassword) {
-                console.log('Encrypted password: ' + encryptedpassword);*/
+                console.log('Encrypted password: ' + encryptedpassword);
                 Credential.check($scope.model.username, $scope.model.password)
                     .then(function success(check) {
                         if (check) {
@@ -97,10 +100,10 @@ app.controller('viewController', function($scope, AppNotifier, Credentials, Cred
                         console.log('Check unsuccessful with error: ' + error);
                         alert('Login fehlgeschlagen.');
                     });
-            /*}, function error(error) {
+            }, function error(error) {
                 console.log('Encryption unsuccessful: ' + error);
                 alert('Login fehlgeschlagen.');
-            });*/
+            });
     };
 
     $scope.logout = function() {
@@ -110,10 +113,20 @@ app.controller('viewController', function($scope, AppNotifier, Credentials, Cred
         AppNotifier.notifyLogout();
     };
 
-    $scope.filter = function(param_angebotsart, param_standort, param_keyword, param_merkzettel) {
+    $scope.filter = function() {
         // TODO Filter list
         // - make REST call through restServices.Joboffer
         // - save filtered list in List service
-        AppNotifier.notifyFilter();
+
+        // All entries
+        Joboffer.offers($scope.model.username, $scope.model.password)
+            .then(function success(offers) {
+                console.log(offers);
+                List.offers = offers;
+                AppNotifier.notifyFilter();
+            }, function error(error) {
+                console.log('Load offers unsuccessful: ' + error);
+                alert('Laden der Angebote fehlgeschlagen.');
+            });
     };
 });

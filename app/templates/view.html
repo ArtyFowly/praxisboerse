@@ -70,13 +70,23 @@
     </div>
 
     <!-- Job list -->
-    <div ng-if="showContentList" class="container">
-        <div class="column" ng-repeat="x in jobs" ng-init="jobs">
-            <div class="row">
-                <h2> {{ x.id }}</h2>
-                <p>{{ x.contact }}</p>
-                <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-            </div>
+    <div ng-if="showContentList" class="jumbotron">
+        <div class="container">
+            <ul class="list-group" ng-repeat="offer in model.offers">
+                <li class="list-group-item row">
+                    <div class="col-md-6">
+                        <a href="#"><span class="glyphicon glyphicon-plus"></span></a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="#">{{offer.shortDescription}}</a>
+                    </div>
+                    <div class="col-md-2">
+                        <br/>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="#">Platzhalter-Firma</a>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 
