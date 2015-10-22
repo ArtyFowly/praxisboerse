@@ -2,28 +2,49 @@
 // Declare app level module which depends on views, and components
 angular
     .module('myApp', ['ngRoute','myApp.version','base64'])
+    .factory('StatusNotifier', function($rootScope) {
+        return {
+            subscribeLogin: function(scope, callback) {
+                var loginHandler = $rootScope.$on('LoginEvent', callback);
+                scope.$on('$destroy', loginHandler);
+            },
+            subscribeLogout: function(scope, callback) {
+                var logoutHandler = $rootScope.$on('LogoutEvent', callback);
+                scope.$on('$destroy', logoutHandler);
+            },
+            notifyLogin: function() {
+                $rootScope.$emit('LoginEvent');
+            },
+            notifyLogout: function() {
+                $rootScope.$emit('LogoutEvent');
+            }
+        };
+    })
     .factory('Credentials', function() {
         var Credentials = {
             username: '',
             password: '',
             encryptedpassword: ''
         };
+
         return Credentials;
     })
-    .config(['$routeProvider', function($routeProvider) {
+    .controller('navController', function($scope, StatusNotifier) {
+        StatusNotifier.subscribeLogin($scope, function() {
+            document.getElementById("nav_login").style.display = "none";
+            document.getElementById("nav_logout").style.display = "inherit";
+            document.getElementById("nav_filter").style.display = "inherit";
+        });
 
-        $routeProvider
-            .when('/showList', {
-                templateUrl: 'templates/showList.html'
-            })
-            .when('/login', {
-                templateUrl: 'templates/login.html'
-            })
-            .otherwise({
-                redirectTo: '/login'
-            });
-    }])
-    .controller('loginController', function($scope, $http, $location, $base64, Credentials) {
+        StatusNotifier.subscribeLogout($scope, function() {
+            document.getElementById("nav_login").style.display = "inherit";
+            document.getElementById("nav_logout").style.display = "none";
+            document.getElementById("nav_filter").style.display = "none";
+        });
+
+        StatusNotifier.notifyLogout();
+    })
+    .controller('loginController', function($scope, $http, $location, $base64, Credentials, StatusNotifier) {
         $scope.login = function () {
             Credentials.username = '';
             Credentials.password = '';
@@ -54,7 +75,7 @@ angular
                         .then(function successCallback(response) {
                             Credentials.username = $scope.username;
                             Credentials.password = $scope.password;
-                            $location.path('/showList');
+                            StatusNotifier.notifyLogin();
                         }, function errorCallback(response) {
                             console.log(response.data);
                             alert('Login fehlgeschlagen.');
@@ -63,6 +84,11 @@ angular
                     console.log(response);
                     alert('Login fehlgeschlagen.');
                 });
+        };
+    })
+    .controller('logoutController', function($scope, StatusNotifier) {
+        $scope.logout = function() {
+            StatusNotifier.notifyLogout();
         };
     })
     .controller('listController', function($base64, $scope, $http, Credentials){
